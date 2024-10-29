@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Nutrient App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Food Nutrient App</h1>
+
+        <!-- Show login/logout options based on user's login status -->
+        {% if current_user.is_authenticated %}
+            <p>Welcome, {{ current_user.username }}!</p>
+            <a href="{{ url_for('logout') }}">Log out</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Log in</a> |
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </header>
+
+    <!-- Search Field -->
+    <section>
+        <h2>Søk etter produkt</h2>
+        <form method="POST" action="{{ url_for('search') }}">
+            <input type="text" name="search" placeholder="Søk etter et produkt" required>
+            <button type="submit">Søk</button>
+        </form>
+    </section>
+
+    <!-- Calorie Tracker Section -->
+    <section>
+        <h2>Kaloriteller for i dag ({{ date.isoformat() }})</h2>
+        <ul>
+            {% for item in calorie_entries %}
+                <li>
+                    <strong>{{ item.name }}</strong> - {{ item.quantity }} g: 
+                    {{ item.calories }} kcal, {{ item.proteins }}g protein, 
+                    {{ item.fat }}g fett, {{ item.carbohydrates }}g karbohydrater
+                    <form method="POST" action="{{ url_for('delete_tracker_entry', index=loop.index0) }}" style="display:inline;">
+                        <button type="submit">Slett</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+        <h3>Total for dagen:</h3>
+        <p>Kalorier: {{ total_calories }} kcal</p>
+        <p>Proteiner: {{ total_proteins }}g</p>
+        <p>Fett: {{ total_fat }}g</p>
+        <p>Karbohydrater: {{ total_carbohydrates }}g</p>
+    </section>
+
+    <!-- Add Product Field -->
+    <section>
+        <h2>Legg Til Produkt</h2>
+        <form method="POST" action="{{ url_for('add_product') }}" enctype="multipart/form-data">
+            <label for="product_name">Produkt Navn:</label>
+            <input type="text" name="product_name" required>
+            <label for="weight">Total Vekt (g):</label>
+            <input type="number" name="weight" required>
+            <label for="proteiner">Proteiner per 100g (g):</label>
+            <input type="number" step="0.1" name="proteiner" required>
+            <label for="fett">Fett per 100g (g):</label>
+            <input type="number" step="0.1" name="fett" required>
+            <label for="karbohydrater">Karbohydrater per 100g (g):</label>
+            <input type="number" step="0.1" name="karbohydrater" required>
+            <label for="product_image">Legg til bilde:</label>
+            <input type="file" name="product_image" accept="image/*">
+            <button type="submit">Legg til</button>
+        </form>
+    </section>
+
+    <!-- Saved Products Field -->
+    <section>
+        <h2>Lagrede Produkter</h2>
+        <ul>
+            {% for product in saved_products %}
+                <li>
+                    <strong>{{ product.name }}</strong> - {{ product.calories }} kcal, 
+                    {{ product.proteins }}g protein, {{ product.fat }}g fett, {{ product.carbohydrates }}g karbohydrater
+                    {% if product.image %}
+                        <br><img src="{{ url_for('static', filename='uploads/' + product.image.split('/')[-1]) }}" alt="{{ product.name }}" width="100">
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" style="display:inline;">
+                        <button type="submit">Slett</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+</body>
+</html>

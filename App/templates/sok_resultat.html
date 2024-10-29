@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Søkeresultat</title>
+</head>
+<body>
+    <h1>Resultater</h1>
+    {% if produkter %}
+        <ul>
+            {% for produkt in produkter %}
+                <li>
+                    <img src="{{ produkt.image_url }}" alt="{{ produkt.name }}" width="100">
+                    <strong>{{ produkt.name }}</strong><br>
+                    Vekt: {{ produkt.weight }} g<br>
+                    <hr>
+                    <strong>Næring per 100g:</strong><br>
+                    {{ produkt.calories_per_100g }} kcal, 
+                    {{ produkt.proteins_per_100g }}g protein, 
+                    {{ produkt.fat_per_100g }}g fett, 
+                    {{ produkt.carbohydrates_per_100g }}g karbohydrater<br>
+                    <form method="POST" action="{{ url_for('add_to_tracker', product_id=produkt.id) }}">
+                        <label for="quantity">Gram:</label>
+                        <input type="number" name="quantity" step="0.1" required>
+                        <button type="submit">Legg til i kaloriteller</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Ingen resultater funnet.</p>
+    {% endif %}
+</body>
+</html>
